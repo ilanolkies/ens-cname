@@ -26,6 +26,7 @@
     "@openzeppelin/test-helpers": "^0.5.4",
     "chai": "^4.2.0",
     "eth-ens-namehash": "^2.0.8",
-    "web3-utils": "^1.2.4"
+    "web3-utils": "^1.2.4",
+    "mem": ">=4.0.0"
   }
 }
