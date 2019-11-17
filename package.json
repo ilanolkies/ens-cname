@@ -1,0 +1,23 @@
+{
+  "name": "ens-cname",
+  "version": "1.0.0",
+  "description": "ENS canonical names",
+  "main": "index.js",
+  "scripts": {
+    "test": "truffle test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ilanolkies/ens-cname.git"
+  },
+  "keywords": [
+    "ens",
+    "cname"
+  ],
+  "author": "@ilanolkies",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ilanolkies/ens-cname/issues"
+  },
+  "homepage": "https://github.com/ilanolkies/ens-cname#readme"
+}
