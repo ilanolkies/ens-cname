@@ -11,11 +11,35 @@ contract CnameResolver {
     ens = _ens;
   }
 
-  function supportsInterface(bytes4 interfaceID) external pure returns (bool) {
-    return (
-      interfaceID == this.supportsInterface.selector ||
-      interfaceID == this.cname.selector
-    );
+  function () payable external {
+    require(msg.data.length >= 36);
+
+    bytes32 node;
+
+    assembly {
+      node := calldataload(4)
+    }
+
+    bytes32 canonical = cname[node];
+    address resolver = ens.resolver(canonical);
+
+    assembly {
+      let ptr := mload(0x40)
+
+      calldatacopy(ptr, 0, 4)
+      mstore(add(ptr, 4), canonical)
+      if gt(calldatasize, 36) {
+        calldatacopy(add(ptr, 36), 36, calldatasize)
+      }
+
+      let result := delegatecall(gas, resolver, ptr, calldatasize, 0, 0)
+      let size := returndatasize
+      returndatacopy(ptr, 0, size)
+
+      switch result
+      case 0 { revert(ptr, size) }
+      default { return(ptr, size) }
+    }
   }
 
   function setCname(bytes32 node, bytes32 canonical) public {

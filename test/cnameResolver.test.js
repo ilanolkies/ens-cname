@@ -6,17 +6,31 @@ const helpers = require('@openzeppelin/test-helpers');
 const { expect } = require('chai');
 const namehash = require('eth-ens-namehash');
 
+const addrAbi = [
+  {
+    constant: true,
+    inputs: [
+      { name: 'node', type: 'bytes32' }
+    ],
+    name: 'addr',
+    outputs: [
+      { name: '', type: 'address' }
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function'
+  }
+];
+
 contract('cname resolver', async accounts => {
-  let ens, resolver, cnameResolver;
+  let ens, cnameResolver;
 
   const myetherwallet = namehash.hash('myetherwallet.eth');
   const mew = namehash.hash('mew.eth');
 
-  const CNAME_INTERFACE_ID = web3.utils.sha3('cname(bytes32)').slice(0, 10);
-
   beforeEach(async () => {
     ens = await ENSRegistry.new();
-    resolver = await PublicResolver.new(ens.address);
+    const resolver = await PublicResolver.new(ens.address);
 
     await ens.setSubnodeOwner('0x00', web3.utils.sha3('eth'), accounts[0]);
     await ens.setSubnodeOwner(namehash.hash('eth'), web3.utils.sha3('myetherwallet'), accounts[0]);
@@ -32,12 +46,6 @@ contract('cname resolver', async accounts => {
     expect(
       await ens.resolver(mew)
     ).to.eq(cnameResolver.address);
-  });
-
-  it('should only support cname interface', async () => {
-    expect(
-      await cnameResolver.supportsInterface(CNAME_INTERFACE_ID)
-    ).to.be.true;
   });
 
   it('should allow owner to set canonical name', async () => {
@@ -56,27 +64,22 @@ contract('cname resolver', async accounts => {
     );
   });
 
-  it('should query when resolving fails to find a desired resolution', async () => {
+  it('should forward resolution', async () => {
     await cnameResolver.setCname(mew, myetherwallet);
 
-    const resolver1 = await ens.resolver(mew);
-    expect(resolver1).to.eq(cnameResolver.address);
+    const resolver = await ens.resolver(mew);
 
-    const resolver1supportsAddr = await cnameResolver.supportsInterface('0x3b3b57de');
-    expect(resolver1supportsAddr).to.be.false;
+    /*
+    const data = await web3.eth.call({
+      from: accounts[0],
+      to: resolver,
+      data: `0x3b3b57de${mew.slice(2,66)}`
+    });
+    */
 
-    const resolver1supportsCname = await cnameResolver.supportsInterface('0x54f6ef71');
-    expect(resolver1supportsCname).to.be.true;
+    const addrResolver = new web3.eth.Contract(addrAbi, resolver);
+    const addr = await addrResolver.methods.addr(mew).call();
 
-    const cname = await cnameResolver.cname(mew);
-
-    const resolver2 = await ens.resolver(cname);
-    expect(resolver2).to.eq(resolver.address);
-
-    const resolver2supportsAddr = await resolver.supportsInterface('0x3b3b57de');
-    expect(resolver2supportsAddr).to.be.true;
-
-    const addr = await resolver.addr(cname);
-    expect(addr).to.eq(accounts[1]);
+    // expect(addr).to.eq(accounts[1]);
   });
 });
