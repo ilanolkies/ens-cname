@@ -1,0 +1,22 @@
+version: 2.1
+jobs:
+  build:
+    working_directory: ~/tpm
+
+    docker:
+      - image: circleci/node:10
+
+    steps:
+      - checkout
+      - run:
+          name: Install Truffle
+          command: sudo npm install -g truffle
+
+      - run:
+          name: Install ens-cname
+          command: |
+                    cd ~/tpm/
+                    npm install
+      - run:
+          name: Run Tests
+          command: npm test
