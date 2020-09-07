@@ -32,7 +32,7 @@ contract CnameResolver {
         calldatacopy(add(ptr, 36), 36, calldatasize)
       }
 
-      let result := delegatecall(gas, resolver, ptr, calldatasize, 0, 0)
+      let result := staticcall(gas, resolver, ptr, calldatasize, 0, 0)
       let size := returndatasize
       returndatacopy(ptr, 0, size)
 
