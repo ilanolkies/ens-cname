@@ -4,7 +4,7 @@
   "description": "ENS canonical names",
   "main": "index.js",
   "scripts": {
-    "test": "truffle test"
+    "test": "npx truffle test"
   },
   "repository": {
     "type": "git",
@@ -23,8 +23,7 @@
   "devDependencies": {
     "chai": "^4.2.0",
     "eth-ens-namehash": "^2.0.8",
-    "web3-utils": "^1.2.4",
-    "mem": ">=4.0.0"
+    "truffle": "^5.1.46"
   },
   "dependencies": {
     "@openzeppelin/test-helpers": "^0.5.4",

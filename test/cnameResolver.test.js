@@ -34,9 +34,15 @@ contract('cname resolver', async accounts => {
     ).to.eq(cnameResolver.address);
   });
 
-  it('should only support cname interface', async () => {
+  it('should support cname interface', async () => {
     expect(
       await cnameResolver.supportsInterface(CNAME_INTERFACE_ID)
+    ).to.be.true;
+  });
+
+  it('should support meta interface', async () => {
+    expect(
+      await cnameResolver.supportsInterface('0x01ffc9a7')
     ).to.be.true;
   });
 
@@ -56,27 +62,12 @@ contract('cname resolver', async accounts => {
     );
   });
 
-  it('should query when resolving fails to find a desired resolution', async () => {
+  it('should query canonical name address resolution', async () => {
     await cnameResolver.setCname(mew, myetherwallet);
 
-    const resolver1 = await ens.resolver(mew);
-    expect(resolver1).to.eq(cnameResolver.address);
+    const publicResolver = await PublicResolver.at(cnameResolver.address);
+    const addr = await publicResolver.addr(mew);
 
-    const resolver1supportsAddr = await cnameResolver.supportsInterface('0x3b3b57de');
-    expect(resolver1supportsAddr).to.be.false;
-
-    const resolver1supportsCname = await cnameResolver.supportsInterface('0x54f6ef71');
-    expect(resolver1supportsCname).to.be.true;
-
-    const cname = await cnameResolver.cname(mew);
-
-    const resolver2 = await ens.resolver(cname);
-    expect(resolver2).to.eq(resolver.address);
-
-    const resolver2supportsAddr = await resolver.supportsInterface('0x3b3b57de');
-    expect(resolver2supportsAddr).to.be.true;
-
-    const addr = await resolver.addr(cname);
     expect(addr).to.eq(accounts[1]);
   });
 });
