@@ -27,7 +27,7 @@
   },
   "dependencies": {
     "@openzeppelin/test-helpers": "^0.5.4",
-    "@ensdomains/ens": "^0.4.0",
+    "@ensdomains/ens": "^0.4.5",
     "@ensdomains/resolver": "^0.1.13",
     "@ensdomains/buffer": "0.0.10",
     "@ensdomains/dnssec-oracle": "^0.1.2"
